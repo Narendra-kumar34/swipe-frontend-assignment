@@ -183,15 +183,27 @@ const InvoiceForm = () => {
     }
   };
 
+  const handleSeeProducts = () => {
+    navigate("/products");
+  };
+
   return (
     <Form onSubmit={openModal}>
-      <div className="d-flex align-items-center">
-        <BiArrowBack size={18} />
-        <div className="fw-bold mt-1 mx-2 cursor-pointer">
-          <Link to="/">
-            <h5>Go Back</h5>
-          </Link>
+      <div className="d-flex flex-row align-items-center justify-content-between pt-2">
+        <div className="d-flex align-items-center">
+          <BiArrowBack size={18} />
+          <div className="fw-bold mt-1 mx-2 cursor-pointer">
+            <Link to="/">
+              <h5>Go Back</h5>
+            </Link>
+          </div>
         </div>
+        <Button
+          variant="primary"
+          onClick={handleSeeProducts}
+        >
+          Browse All Products
+        </Button>
       </div>
 
       <Row>
