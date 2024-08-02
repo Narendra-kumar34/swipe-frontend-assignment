@@ -35,7 +35,7 @@ const InvoiceModal = (props) => {
     items.forEach((item) => {
       const productFromList = productList.find(
         (product) => product.name === item.itemName
-      );
+      ) || [];
       const category = productFromList.category;
       const categoryObj = itemArray.find((item) => item.category === category);
       if (categoryObj) {

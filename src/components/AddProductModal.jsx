@@ -9,7 +9,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { useDispatch } from "react-redux";
 import generateRandomId from "../utils/generateRandomId";
 import { addProduct, editProduct } from "../redux/productSlice";
-import { updateExistingInvoices } from "../redux/invoicesSlice";
+import { updateInvoice } from "../redux/invoicesSlice";
 import { selectInvoiceList } from "../redux/invoicesSlice";
 import { useSelector } from "react-redux";
 
@@ -30,6 +30,50 @@ export default function AddProductModal(props) {
     }
   }, [props.isEdit, props.product]);
 
+  const handleUpdateExistingInvoices = (updatedProduct) => {
+    const allInvoices = JSON.parse(JSON.stringify(invoiceList));
+    allInvoices.forEach((invoice) => {
+      let shouldUpdate = false;
+      invoice.items.forEach((item) => {
+        if(item.itemName == updatedProduct.name) {
+          shouldUpdate = true;
+          item.itemName = updatedProduct.name;
+          item.itemPrice = updatedProduct.price;
+          item.itemDescription = updatedProduct.description;
+        }
+      });
+      if(shouldUpdate) {
+        dispatch(updateInvoice({ id: invoice.id, updatedInvoice: updateInvoiceTotal(invoice) }));
+      }
+    })
+  }
+
+  const updateInvoiceTotal = (invoice) => {
+    let subTotal = 0;
+    invoice.items.forEach((item) => {
+      subTotal +=
+        parseFloat(item.itemPrice).toFixed(2) * parseInt(item.itemQuantity);
+    });
+    const taxAmount = parseFloat(
+      subTotal * (invoice.taxRate / 100)
+    ).toFixed(2);
+    const discountAmount = parseFloat(
+      subTotal * (invoice.discountRate / 100)
+    ).toFixed(2);
+    const total = (
+      subTotal -
+      parseFloat(discountAmount) +
+      parseFloat(taxAmount)
+    ).toFixed(2);
+    return {
+      ...invoice,
+      subTotal: parseFloat(subTotal).toFixed(2),
+      taxAmount,
+      discountAmount,
+      total,
+    };
+  }
+
   const handleAddEdit = () => {
     const productData = {
       name: name,
@@ -39,7 +83,7 @@ export default function AddProductModal(props) {
     };
     if (props.isEdit) {
       dispatch(editProduct({ id: props.product.id, updatedProduct: { id: props.product.id, ...productData } }));
-      dispatch(updateExistingInvoices({ updatedProduct: { id: props.product.id, ...productData } }));
+      handleUpdateExistingInvoices({id: props.product.id, ...productData });
       alert("Product updated successfully 🥳");
     } else {
       dispatch(addProduct({ product: { id: generateRandomId(), ...productData } }));

@@ -162,6 +162,50 @@ const InvoiceForm = () => {
     setIsOpen(false);
   };
 
+  const handleUpdateExistingInvoices = (updatedProduct) => {
+    const allInvoices = JSON.parse(JSON.stringify(invoiceList));
+    allInvoices.forEach((invoice) => {
+      let shouldUpdate = false;
+      invoice.items.forEach((item) => {
+        if(item.itemName == updatedProduct.name) {
+          shouldUpdate = true;
+          item.itemName = updatedProduct.name;
+          item.itemPrice = updatedProduct.price;
+          item.itemDescription = updatedProduct.description;
+        }
+      });
+      if(shouldUpdate) {
+        dispatch(updateInvoice({ id: invoice.id, updatedInvoice: updateInvoiceTotal(invoice) }));
+      }
+    })
+  }
+
+  const updateInvoiceTotal = (invoice) => {
+    let subTotal = 0;
+    invoice.items.forEach((item) => {
+      subTotal +=
+        parseFloat(item.itemPrice).toFixed(2) * parseInt(item.itemQuantity);
+    });
+    const taxAmount = parseFloat(
+      subTotal * (invoice.taxRate / 100)
+    ).toFixed(2);
+    const discountAmount = parseFloat(
+      subTotal * (invoice.discountRate / 100)
+    ).toFixed(2);
+    const total = (
+      subTotal -
+      parseFloat(discountAmount) +
+      parseFloat(taxAmount)
+    ).toFixed(2);
+    return {
+      ...invoice,
+      subTotal: parseFloat(subTotal).toFixed(2),
+      taxAmount,
+      discountAmount,
+      total,
+    };
+  }
+
   const handleAddInvoice = () => {
     const items = formData.items;
     items.forEach((item) => {
@@ -175,7 +219,7 @@ const InvoiceForm = () => {
           category: productFromList.category,
         };
         dispatch(editProduct({id: productFromList.id, updatedProduct: updatedProduct}));
-        //dispatch(updateExistingInvoices({ updatedProduct: updatedProduct }));
+        handleUpdateExistingInvoices(updatedProduct);
       }
       else {
         const newProduct = {

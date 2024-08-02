@@ -24,7 +24,7 @@ const invoicesSlice = createSlice({
       
       return state.map((invoice) => {
         const updatedItems = invoice.items.map((item) =>
-          item.itemId === updatedProduct.id
+          item.itemName === updatedProduct.name
             ? {
                 ...item,
                 itemName: updatedProduct.name,
