@@ -175,7 +175,7 @@ const InvoiceForm = () => {
           category: productFromList.category,
         };
         dispatch(editProduct({id: productFromList.id, updatedProduct: updatedProduct}));
-        //dispatch(updateExistingInvoices({ id: item.itemId, updatedProduct: updatedProduct }));
+        //dispatch(updateExistingInvoices({ updatedProduct: updatedProduct }));
       }
       else {
         const newProduct = {

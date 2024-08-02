@@ -8,6 +8,8 @@ import Modal from "react-bootstrap/Modal";
 import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useSelector } from "react-redux";
+import { selectProductList } from "../redux/productSlice";
 
 const GenerateInvoice = () => {
   html2canvas(document.querySelector("#invoiceCapture")).then((canvas) => {
@@ -27,6 +29,24 @@ const GenerateInvoice = () => {
 };
 
 const InvoiceModal = (props) => {
+  const productList = useSelector(selectProductList);
+  const splittedItems = (items) => {
+    const itemArray = [];
+    items.forEach((item) => {
+      const productFromList = productList.find(
+        (product) => product.name === item.itemName
+      );
+      const category = productFromList.category;
+      const categoryObj = itemArray.find((item) => item.category === category);
+      if (categoryObj) {
+        categoryObj.list.push(...item);
+      } else {
+        itemArray.push({ category: category, list: [{ ...item }] });
+      }
+    });
+    return itemArray;
+  };
+  const newItems = splittedItems(props.items);
   return (
     <div>
       <Modal
@@ -75,34 +95,47 @@ const InvoiceModal = (props) => {
                 <div>{props.info.dateOfIssue || ""}</div>
               </Col>
             </Row>
-            <Table className="mb-0">
-              <thead>
-                <tr>
-                  <th>QTY</th>
-                  <th>DESCRIPTION</th>
-                  <th className="text-end">PRICE</th>
-                  <th className="text-end">AMOUNT</th>
-                </tr>
-              </thead>
-              <tbody>
-                {props.items.map((item, i) => {
-                  return (
-                    <tr id={i} key={i}>
-                      <td style={{ width: "70px" }}>{item.itemQuantity}</td>
-                      <td>
-                        {item.itemName} - {item.itemDescription}
-                      </td>
-                      <td className="text-end" style={{ width: "100px" }}>
-                        {props.currency} {item.itemPrice}
-                      </td>
-                      <td className="text-end" style={{ width: "100px" }}>
-                        {props.currency} {item.itemPrice * item.itemQuantity}
-                      </td>
+            {newItems.map((items) => (
+              <Table className="mb-0">
+                <thead>
+                  {newItems.length > 1 && (
+                    <tr>
+                      <th
+                        className="text-center"
+                        colSpan={4}
+                        style={{ backgroundColor: "lightblue" }}
+                      >
+                        {items.category}
+                      </th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
+                  )}
+                  <tr>
+                    <th>QTY</th>
+                    <th>DESCRIPTION</th>
+                    <th className="text-end">PRICE</th>
+                    <th className="text-end">AMOUNT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.list.map((item, i) => {
+                    return (
+                      <tr id={i} key={i}>
+                        <td style={{ width: "70px" }}>{item.itemQuantity}</td>
+                        <td>
+                          {item.itemName} - {item.itemDescription}
+                        </td>
+                        <td className="text-end" style={{ width: "100px" }}>
+                          {props.currency} {item.itemPrice}
+                        </td>
+                        <td className="text-end" style={{ width: "100px" }}>
+                          {props.currency} {item.itemPrice * item.itemQuantity}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            ))}
             <Table>
               <tbody>
                 <tr>
