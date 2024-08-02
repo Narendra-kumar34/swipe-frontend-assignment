@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import { BiTrash } from "react-icons/bi";
 import EditableField from "./EditableField";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import { useSelector } from "react-redux";
+import { selectProductList } from "../redux/productSlice";
 
 const InvoiceItem = (props) => {
   const { onItemizedItemEdit, currency, onRowDel, items, onRowAdd } = props;
@@ -39,6 +43,8 @@ const InvoiceItem = (props) => {
 };
 
 const ItemRow = (props) => {
+  // const productList = useSelector(selectProductList);
+  // const [selectedProduct, setProduct] = useState("");
   const onDelEvent = () => {
     props.onDelEvent(props.item);
   };
@@ -57,6 +63,15 @@ const ItemRow = (props) => {
             id: props.item.itemId,
           }}
         />
+        {/* <DropdownButton
+          id="dropdown-basic-button"
+          data-bs-theme="dark"
+          variant="secondary"
+          title={selectedProduct || "Select Item"}
+          onSelect={(eventKey) => setProduct(eventKey)}
+        >
+          {productList.map((product) => <Dropdown.Item eventKey={product.name}>{product.name}</Dropdown.Item>)}
+        </DropdownButton> */}
         <EditableField
           onItemizedItemEdit={(evt) =>
             props.onItemizedItemEdit(evt, props.item.itemId)

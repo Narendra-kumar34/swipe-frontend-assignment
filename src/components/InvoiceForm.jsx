@@ -14,6 +14,10 @@ import { addInvoice, updateInvoice } from "../redux/invoicesSlice";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import generateRandomId from "../utils/generateRandomId";
 import { useInvoiceListData } from "../redux/hooks";
+import { addProduct, editProduct, selectProductList } from "../redux/productSlice";
+import { useSelector } from "react-redux";
+import { updateExistingInvoices } from "../redux/invoicesSlice";
+import { selectInvoiceList } from "../redux/invoicesSlice";
 
 const InvoiceForm = () => {
   const dispatch = useDispatch();
@@ -22,6 +26,8 @@ const InvoiceForm = () => {
   const navigate = useNavigate();
   const isCopy = location.pathname.includes("create");
   const isEdit = location.pathname.includes("edit");
+  const productList = useSelector(selectProductList);
+  const invoiceList = useSelector(selectInvoiceList);
 
   const [isOpen, setIsOpen] = useState(false);
   const [copyId, setCopyId] = useState("");
@@ -157,8 +163,36 @@ const InvoiceForm = () => {
   };
 
   const handleAddInvoice = () => {
+    const items = formData.items;
+    items.forEach((item) => {
+      const productFromList = productList.find((product) => product.name === item.itemName);
+      if(productFromList) {
+        const updatedProduct = {
+          id: productFromList.id,
+          name: item.itemName,
+          price: item.itemPrice,
+          description: item.itemDescription,
+          category: productFromList.category,
+        };
+        dispatch(editProduct({id: productFromList.id, updatedProduct: updatedProduct}));
+        //dispatch(updateExistingInvoices({ id: item.itemId, updatedProduct: updatedProduct }));
+      }
+      else {
+        const newProduct = {
+          id: item.itemId,
+          name: item.itemName,
+          price: item.itemPrice,
+          description: item.itemDescription,
+          category: productFromList.category,
+        }
+        dispatch(addProduct({product: newProduct}));
+      }
+    });
+    setFormData({ ...formData, items: items });
     if (isEdit) {
+      console.log(invoiceList);
       dispatch(updateInvoice({ id: params.id, updatedInvoice: formData }));
+      console.log(invoiceList);
       alert("Invoice updated successfuly 🥳");
     } else if (isCopy) {
       dispatch(addInvoice({ id: generateRandomId(), ...formData }));

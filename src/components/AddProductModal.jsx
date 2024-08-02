@@ -9,6 +9,9 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { useDispatch } from "react-redux";
 import generateRandomId from "../utils/generateRandomId";
 import { addProduct, editProduct } from "../redux/productSlice";
+import { updateExistingInvoices } from "../redux/invoicesSlice";
+import { selectInvoiceList } from "../redux/invoicesSlice";
+import { useSelector } from "react-redux";
 
 export default function AddProductModal(props) {
   const [name, setName] = useState(props.isEdit ? props.product.name : "");
@@ -16,6 +19,7 @@ export default function AddProductModal(props) {
   const [price, setPrice] = useState(props.isEdit ? props.product.price : 1);
   const [category, setCategory] = useState(props.isEdit ? props.product.category : "");
   const dispatch = useDispatch();
+  const invoiceList = useSelector(selectInvoiceList);
 
   useEffect(() => {
     if (props.isEdit) {
@@ -35,6 +39,7 @@ export default function AddProductModal(props) {
     };
     if (props.isEdit) {
       dispatch(editProduct({ id: props.product.id, updatedProduct: { id: props.product.id, ...productData } }));
+      dispatch(updateExistingInvoices({ updatedProduct: { id: props.product.id, ...productData } }));
       alert("Product updated successfully 🥳");
     } else {
       dispatch(addProduct({ product: { id: generateRandomId(), ...productData } }));
