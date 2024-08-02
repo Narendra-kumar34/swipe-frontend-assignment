@@ -16,7 +16,6 @@ import generateRandomId from "../utils/generateRandomId";
 import { useInvoiceListData } from "../redux/hooks";
 import { addProduct, editProduct, selectProductList } from "../redux/productSlice";
 import { useSelector } from "react-redux";
-import { updateExistingInvoices } from "../redux/invoicesSlice";
 import { selectInvoiceList } from "../redux/invoicesSlice";
 
 const InvoiceForm = () => {
