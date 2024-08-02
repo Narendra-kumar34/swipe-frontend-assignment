@@ -24,4 +24,4 @@
 
 ## Deployment
 
-Deployed the application on Vercel - 
+Deployed the application on Vercel - https://swipe-frontend-assignment-delta.vercel.app/
